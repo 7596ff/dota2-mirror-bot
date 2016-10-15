@@ -9,7 +9,7 @@ to run for yourself a bunch of steps need to be taken:
 
  on initial creation, the steam account will not be able to talk in public chat channels. from here you have two choices. you can either play enough games to get to level 5 in dota or you can spend five dollars on steam. if you don't want to play dumb smurf games i recommend [golf with your friends](http://store.steampowered.com/app/431240/). its six dollars so it will activate your account, and it's pretty fun too. 
 
-1. install packages by running `npm install steam`(to work around [#222](https://github.com/seishun/node-steam/issues/222)) and then `npm install`
+1. install packages by running `npm install steam` (to work around [#222](https://github.com/seishun/node-steam/issues/222)) and then `npm install`
 
 1. edit config.example and add all your information. rename as config.js.
 
