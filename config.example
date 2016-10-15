@@ -1,0 +1,35 @@
+// Configure and rename to "config.js"
+// Create an empty file called "sentry" in same directory
+// Have steamguard code = "" to start
+// Fill in the steamguard code after receiving it
+// After successfully logging in, return steamguard code to ""
+var config = {};
+
+// dota bot's steam name
+config.steam_name = "";
+
+// dota bot's steam username
+config.steam_user = "";
+
+// dota bot's steam password
+config.steam_pass = "";
+
+// turning off steam guard is easier than using this, but if the dota bot requires a steam guard code to log in, put it here
+config.steam_guard_code = "";
+
+// discord bot's token
+config.discord_token = "";
+
+// dota bot's chat channel to mirror
+config.bot_channel = '';
+
+// dota bot's chat channel type (refer here for types: https://github.com/Arcana/node-dota2/blob/92ae65736c112f74a1d7c67d4d4f5ec5f8af7316/proto/dota_shared_enums.proto#L122)
+config.bot_channel_type = '';
+
+// discord bot's listen channel 
+config.discord_listen_channel = '';
+
+// discord bot's id
+config.discord_self_id = '';
+
+module.exports = config;
