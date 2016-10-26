@@ -91,12 +91,14 @@ var onSteamLogOff = function onSteamLogOff(eresult) {
 };
 
 var onSteamError = function onSteamError(error) {
-<<<<<<< HEAD
 	util.log('Connection closed by server.');
 	gracefulRestart();
+<<<<<<< HEAD
 =======
     util.log('Connection closed by server.');
 >>>>>>> 0caa001... tabs to spaces
+=======
+>>>>>>> be02dc0... wahts hapepning
 };
 
 steamUser.on('updateMachineAuth', function(sentry, callback) {

@@ -2,7 +2,7 @@
 	"dependencies": {
 		"steam": "",
 		"dota2": "",
-		"discord.js": "",
+		"discord.js": "9.3.2",
 		"async": ""
 	}
 }
