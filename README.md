@@ -15,8 +15,9 @@ to run for yourself a bunch of steps need to be taken:
 
 1. use `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID_GOES_HERE&scope=bot&permissions=0` to add your discord bot to your server. 
 
-1. install forever with `npm install forever -g`
+1. install pm2 with `npm install pm2 -g`
 
-1. run the bot with forever start bot.js. this will start the bot as a daemon, and it is written to restart itself when the dota 2 GC goes down. 
+1. run the bot with `pm2 start bot.js --name="mirror"`. this will start the bot as a daemon, and it is written to restart itself when the dota 2 GC goes down. 
 
-features coming later include refactoring the code to make it neater, and using forever-monitor instead of forever to make it self-aware(?)
+
+features coming later include refactoring the code to make it neater and work with the newest version of node-dota2
