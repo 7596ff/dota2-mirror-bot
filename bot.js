@@ -70,8 +70,10 @@ var onSteamLogOn = function onSteamLogOn(logonResp) {
 
         bot.on('message', message => {
             if (message.channel.name == 'club-purple' && message.member.user.id != global.config.discord_self_id) {
-                console.log('message from discord: ' + message.member.user.username + ': ' + message.content);
-                sendToDota(message.member.user.username + ': ' + message.content);
+                let nickname = message.member.user.username;
+                if (message.member.nickname != null) nickname = message.member.nickname;
+                console.log('message from discord: ' + nickname + ': ' + message.content);
+                sendToDota(nickname + ': ' + message.content);
 
                 if (message.content === "!restart") {
                     gracefulRestart();
