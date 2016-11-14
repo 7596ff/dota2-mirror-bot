@@ -22,5 +22,4 @@ to run for yourself a bunch of steps need to be taken:
 1. run the bot with `pm2 start bot.js --name="mirror"`. this will start the bot as a daemon, and it is written to restart itself when the dota 2 GC goes down. 
 
  you can use `pm2 logs` to stream the log of the app in real time, this is recommended
-
-features coming later include refactoring the code to make it neater and work with the newest version of node-dota2
+ 
