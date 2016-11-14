@@ -11,35 +11,31 @@ var steamClient = new steam.SteamClient(),
     Dota2 = new dota2.Dota2Client(steamClient, true, true);
 
 // load config
-global.config = require('./config');
+var config = require('./config.json');
 
 // discord.js stuff
 const Discord = require('discord.js');
 const bot = new Discord.Client();
-const token = global.config.discord_token;
+const token = config.discord_token;
 
 // sendmessage easier
 var sendToDota = function(msg) {
-    Dota2.sendMessage(global.config.bot_channel, msg, global.config.bot_channel_type);
+    Dota2.sendMessage(config.bot_channel, msg, config.bot_channel_type);
 }
 
 // do send message stuff
 var dualMessage = function(msg) {
-    bot.channels.get(global.config.discord_listen_channel).sendMessage('`' + msg + '`');
+    bot.channels.get(config.discord_listen_channel).sendMessage('`' + msg + '`');
     sendToDota(msg);
 };
 
 var gracefulRestart = function() {
-    console.log('restarting.');
+    util.log('restarting.');
     dualMessage('Restarting.');
     setTimeout(function() {process.exit();}, 2000);
-}
-
-var discordParseEmoji = function(message) {
-
 };
 
-var onSteamLogOn = function onSteamLogOn(logonResp) {
+var onSteamLogOn = function(logonResp) {
     if (logonResp.eresult == steam.EResult.OK) {
         steamFriends.setPersonaState(steam.EPersonaState.Busy);
         steamFriends.setPersonaName(global.steam_name);
@@ -48,31 +44,33 @@ var onSteamLogOn = function onSteamLogOn(logonResp) {
         Dota2.on('ready', function() {
             // do chat logic
 
-            Dota2.joinChat(global.config.bot_channel, global.config.bot_channel_type);
+            Dota2.joinChat(config.bot_channel, config.bot_channel_type);
 
-            console.log('Node-dota2 ready.');
+            util.log('Node-dota2 ready.');
         });
 
-        Dota2.on('unready', function onUnready() {
-            console.log('Node-dota2 unready.');
+        Dota2.on('unready', () => {
+            util.log('Node-dota2 unready.');
         });
+
         Dota2.on('chatMessage', function(channel, personaName, message) {
-            console.log('message from dota: ' + personaName + ': ' + message);
-            bot.channels.get(global.config.discord_listen_channel).sendMessage('**' + personaName + ':** ' + message);
+            util.log('message from dota: ' + personaName + ': ' + message);
+            bot.channels.get(config.discord_listen_channel).sendMessage('**' + personaName + ':** ' + message);
         });
-        Dota2.on('unhandled', function(kMsg) {
+
+        Dota2.on('unhandled', (kMsg) => {
             util.log('UNHANDLED MESSAGE' + kMsg);
         });
 
-        Dota2.on('hellotimeout', function() {
+        Dota2.on('hellotimeout', () => {
             gracefulRestart();
         });
 
         bot.on('message', message => {
-            if (message.channel.name == 'club-purple' && message.member.user.id != global.config.discord_self_id) {
+            if (message.channel.name == 'club-purple' && message.member.user.id != config.discord_self_id) {
                 let nickname = message.member.user.username;
                 if (message.member.nickname != null) nickname = message.member.nickname;
-                console.log('message from discord: ' + nickname + ': ' + message.content);
+                util.log('message from discord: ' + nickname + ': ' + message.content);
                 sendToDota(nickname + ': ' + message.content);
 
                 if (message.content === "!restart") {
@@ -83,7 +81,7 @@ var onSteamLogOn = function onSteamLogOn(logonResp) {
     }
 };
 
-var onSteamServers = function onSteamServers(servers) {
+var onSteamServers = function(servers) {
     util.log('Recieved servers.');
     fs.writeFile('servers', JSON.stringify(servers), (err) => {
         if (err) throw err;
@@ -91,11 +89,11 @@ var onSteamServers = function onSteamServers(servers) {
     });
 };
 
-var onSteamLogOff = function onSteamLogOff(eresult) {
+var onSteamLogOff = function(eresult) {
     util.log('Logged off from steam.');
 };
 
-var onSteamError = function onSteamError(error) {
+var onSteamError = function(error) {
 	util.log('Connection closed by server.');
 	gracefulRestart();
 <<<<<<< HEAD
@@ -106,7 +104,7 @@ var onSteamError = function onSteamError(error) {
 >>>>>>> be02dc0... wahts hapepning
 };
 
-steamUser.on('updateMachineAuth', function(sentry, callback) {
+steamUser.on('updateMachineAuth', (sentry, callback) => {
     var hashedSentry = crypto.createHash('sha1').update(sentry.bytes).digest();
     fs.writeFileSync('sentry', hashedSentry)
     util.log("sentryfile saved");
@@ -117,18 +115,16 @@ steamUser.on('updateMachineAuth', function(sentry, callback) {
 
 // discord
 bot.on('ready', () => {
-    console.log('discord ready.');
+    util.log('discord ready.');
 });
 
 // log in, no auth code needed
 var logOnDetails = {
-    "account_name": global.config.steam_user,
-    "password": global.config.steam_pass,
+    "account_name": config.steam_user,
+    "password": config.steam_pass,
 };
 
-if (global.config.steam_guard_code) {
-    logOnDetails.auth_code = global.config.steam_guard_code;
-}
+if (config.steam_guard_code) logOnDetails.auth_code = config.steam_guard_code;
 
 try {
     var sentry = fs.readFileSync('sentry');
@@ -138,7 +134,7 @@ try {
 }
 
 steamClient.connect();
-steamClient.on('connected', function() {
+steamClient.on('connected', () => {
     steamUser.logOn(logOnDetails);
 });
 steamClient.on('logOnResponse', onSteamLogOn);

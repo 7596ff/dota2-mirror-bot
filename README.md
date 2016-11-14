@@ -11,7 +11,9 @@ to run for yourself a bunch of steps need to be taken:
 
 1. install packages by running `npm install steam` (to work around [#222](https://github.com/seishun/node-steam/issues/222)) and then `npm install`
 
-1. edit config.example and add all your information. rename as config.js.
+1. edit config.js.example and add all your information. rename it to config.js.
+
+1. run `node setup.js`, and make sure it writes out a `config.json` file. 
 
 1. use `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID_GOES_HERE&scope=bot&permissions=0` to add your discord bot to your server. 
 
