@@ -3,6 +3,7 @@
 		"steam": "",
 		"dota2": "4.0.0",
 		"discord.js": "10.0.1",
-		"async": ""
+		"async": "",
+		"sqlite3": ""
 	}
 }

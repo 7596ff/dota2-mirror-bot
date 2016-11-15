@@ -1,4 +1,7 @@
+const sqlite3 = require('sqlite3');
 var config;
+
+var db = new sqlite3.Database('users');
 
 try {
     config = require('./config.js');
@@ -17,3 +20,10 @@ if (str_config) {
         console.log('Config written! Start your both with node bot or pm2 start bot --name="mirrorbot".');
     });
 }
+
+// setup db
+db.serialize(() => {
+    db.run('CREATE TABLE users (discord_id TEXT primary key, dota_id TEXT)')
+});
+
+db.close();

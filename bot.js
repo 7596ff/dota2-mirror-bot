@@ -10,6 +10,9 @@ var steamClient = new steam.SteamClient(),
     steamFriends = new steam.SteamFriends(steamClient),
     Dota2 = new dota2.Dota2Client(steamClient, true, true);
 
+//sqlite3 stuff
+const sqlite3 = require('sqlite3');
+
 // load config
 var config = require('./config.json');
 
@@ -25,7 +28,7 @@ var sendToDota = function(msg) {
 
 // do send message stuff
 var dualMessage = function(msg) {
-    bot.channels.get(config.discord_listen_channel).sendMessage('`' + msg + '`');
+    bot.channels.get(config.discord_listen_channel).sendMessage(msg);
     sendToDota(msg);
 };
 
@@ -75,6 +78,35 @@ var onSteamLogOn = function(logonResp) {
 
                 if (message.content === "!restart") {
                     gracefulRestart();
+                }
+
+                if (message.content.startsWith('!link')) {
+                    let acc_id = message.content.split(' ')[1];
+                    let discord_id = message.member.id;
+                    
+                    util.log(`linking discord user ${discord_id} with account id ${acc_id}`);
+
+                    let db = new sqlite3.Database('users');
+                    
+                    db.serialize(() => {
+                        db.get(`SELECT * FROM users WHERE discord_id = ${discord_id};`, (err, result) => {
+                            if (err) console.log(err);
+
+                            if (!result) {
+                                console.log('no results found with that id. adding to db.');
+                                message.channel.sendMessage('Registering Dota ID with your Discord account...').then(new_message => {
+                                    db.run(`INSERT INTO users VALUES('${discord_id}', '${acc_id}');`);
+                                    new_message.edit(`Registered Discord account \`${discord_id}\` with Dota ID \`${acc_id}\``);
+                                    sendToDota(`Registered Discord account \`${discord_id}\` with Dota ID \`${acc_id}\``);
+                                    db.close();
+                                }).catch(err => console.log(err));
+                            } else {
+                                console.log('a result was already found with that id, ' + JSON.stringify(result));
+                                dualMessage('You are already registered!');
+                                db.close();
+                            }
+                        });
+                    });
                 }
             }
         });
