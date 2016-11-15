@@ -2,6 +2,9 @@ config.json
 users
 sentry
 servers
+setupdb.js 
+sqlite3test.js 
+
 
 # Logs
 logs
