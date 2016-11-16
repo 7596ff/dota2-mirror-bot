@@ -23,6 +23,8 @@ const token = config.discord_token;
 
 // sendmessage easier
 var sendToDota = function (msg) {
+  var cache = Dota2._getChannelByName(config.bot_channel, config.bot_channel_type);
+  if (cache === undefined) gracefulRestart();
   Dota2.sendMessage(config.bot_channel, msg, config.bot_channel_type);
 }
 
