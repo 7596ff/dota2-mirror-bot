@@ -88,11 +88,22 @@ var onSteamLogOn = function (logonResp) {
 
           util.log(`linking discord user ${discord_id} with account id ${acc_id}`);
 
+          if (isNaN(acc_id)) {
+            dualMessage('Please input a Dota ID (aka a number)!');
+            return;
+          }
+          
           let db = new sqlite3.Database('users');
-
+      
           db.serialize(() => {
             db.get(`SELECT * FROM users WHERE discord_id = ${discord_id};`, (err, result) => {
               if (err) console.log(err);
+
+              if (acc_id > 2147483647) {
+                message.channel.sendMessage('This ID is too long! Please copy your short ID (from your dota profile!)');
+                db.close();
+                return;
+              }
 
               if (!result) {
                 console.log('no results found with that id. adding to db.');
@@ -104,8 +115,11 @@ var onSteamLogOn = function (logonResp) {
                 }).catch(err => console.log(err));
               } else {
                 console.log('a result was already found with that id, ' + JSON.stringify(result));
-                dualMessage('You are already registered!');
-                db.close();
+                message.channel.sendMessage('Updating your Discord account with a new Dota ID...').then(new_message => {
+                  db.run(`UPDATE OR REPLACE users SET dota_id = ${acc_id} WHERE discord_id = ${discord_id}`);
+                  new_message.edit(`Updated Discord account \`${discord_id}\` with Dota ID \`${acc_id}\``);
+                  db.close();
+                }).catch(err => console.log(err));
               }
             });
           });
