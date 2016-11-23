@@ -23,9 +23,9 @@ const token = config.discord_token;
 
 // sendmessage easier
 var sendToDota = function (msg) {
-  var cache = Dota2._getChannelByName(config.bot_channel, config.bot_channel_type);
-  if (cache === undefined) gracefulRestart();
-  Dota2.sendMessage(config.bot_channel, msg, config.bot_channel_type);
+  //var cache = Dota2._getChannelByName(config.bot_channel, config.bot_channel_type);
+  //if (cache === undefined) gracefulRestart();
+  Dota2.sendMessage(config.bot_channel);
 }
 
 // do send message stuff
@@ -83,12 +83,12 @@ var onSteamLogOn = function (logonResp) {
         }
 
         if (message.content.startsWith('!link')) {
-          let acc_id = message.content.split(' ')[1];
+          let dota_id = message.content.split(' ')[1];
           let discord_id = message.member.id;
 
-          util.log(`linking discord user ${discord_id} with account id ${acc_id}`);
+          util.log(`linking discord user ${discord_id} with account id ${dota_id}`);
 
-          if (isNaN(acc_id)) {
+          if (isNaN(dota_id)) {
             dualMessage('Please input a Dota ID (aka a number)!');
             return;
           }
@@ -99,7 +99,7 @@ var onSteamLogOn = function (logonResp) {
             db.get(`SELECT * FROM users WHERE discord_id = ${discord_id};`, (err, result) => {
               if (err) console.log(err);
 
-              if (acc_id > 2147483647) {
+              if (dota_id > 2147483647) {
                 message.channel.sendMessage('This ID is too long! Please copy your short ID (from your dota profile!)');
                 db.close();
                 return;
@@ -108,21 +108,42 @@ var onSteamLogOn = function (logonResp) {
               if (!result) {
                 console.log('no results found with that id. adding to db.');
                 message.channel.sendMessage('Registering Dota ID with your Discord account...').then(new_message => {
-                  db.run(`INSERT INTO users VALUES('${discord_id}', '${acc_id}');`);
-                  new_message.edit(`Registered Discord account \`${discord_id}\` with Dota ID \`${acc_id}\``);
-                  sendToDota(`Registered Discord account \`${discord_id}\` with Dota ID \`${acc_id}\``);
+                  db.run(`INSERT INTO users VALUES('${discord_id}', '${dota_id}');`);
+                  new_message.edit(`Registered Discord account \`${discord_id}\` with Dota ID \`${dota_id}\``);
+                  sendToDota(`Registered Discord account \`${discord_id}\` with Dota ID \`${dota_id}\``);
                   db.close();
                 }).catch(err => console.log(err));
               } else {
                 console.log('a result was already found with that id, ' + JSON.stringify(result));
                 message.channel.sendMessage('Updating your Discord account with a new Dota ID...').then(new_message => {
-                  db.run(`UPDATE OR REPLACE users SET dota_id = ${acc_id} WHERE discord_id = ${discord_id}`);
-                  new_message.edit(`Updated Discord account \`${discord_id}\` with Dota ID \`${acc_id}\``);
+                  db.run(`UPDATE OR REPLACE users SET dota_id = ${dota_id} WHERE discord_id = ${discord_id}`);
+                  new_message.edit(`Updated Discord account \`${discord_id}\` with Dota ID \`${dota_id}\``);
                   db.close();
                 }).catch(err => console.log(err));
               }
             });
           });
+        }
+
+        if (message.content.startsWith('!info')) {
+          let discord_id = message.member.id;
+          let db = new sqlite3.Database('users');
+
+          util.log(`checking stats on discord id ${discord_id}`);
+
+          db.get(`SELECT * FROM users WHERE discord_id = ${discord_id}`, (err, result) => {
+            if (err) console.log(err);
+            console.log(result);  
+            if (result == undefined) {
+              dualMessage('Please link your Dota account with the bot first! `!link <your dota id>`');
+              return;
+            } 
+            
+            let dota_id = result.dota_id;
+            });
+          });
+
+          db.close();
         }
       }
     });
