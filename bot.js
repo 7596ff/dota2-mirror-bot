@@ -140,6 +140,11 @@ var onSteamLogOn = function (logonResp) {
             } 
             
             let dota_id = result.dota_id;
+            Dota2.requestPlayerStats(parseInt(dota_id), (acc_id, playerStats) => {
+              dualMessage('some preliminary stats for ' + dota_id);
+              dualMessage('    matches: ' + playerStats['match_count']);
+              dualMessage('    rampages: ' + playerStats['rampages']);
+              dualMessage(`    mean gpm/xpm: ${playerStats['mean_gpm']}/${playerStats['mean_xppm']}`);
             });
           });
 
