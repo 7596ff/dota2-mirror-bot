@@ -21,11 +21,26 @@ const Discord = require('discord.js');
 const bot = new Discord.Client();
 const token = config.discord_token;
 
+// calculate battle pass level
+var calcLevel = function(level) {
+  if (level == 0) {
+    return "";
+  } else if (level < 20000) {
+    return "<:trophy_1:251810862161985536>";
+  } else if (level < 40000) {
+    return "<:trophy_2:251810861763526657>";
+  } else if (level < 60000) {
+    return "<:trophy_3:251810862224900096>";
+  } else {
+    return "<:trophy_4:251810862686273546>";
+  }
+}
+
 // sendmessage easier
 var sendToDota = function (msg) {
   //var cache = Dota2._getChannelByName(config.bot_channel, config.bot_channel_type);
   //if (cache === undefined) gracefulRestart();
-  Dota2.sendMessage(config.bot_channel);
+  Dota2.sendMessage(config.bot_channel, msg);
 }
 
 // do send message stuff
@@ -58,9 +73,11 @@ var onSteamLogOn = function (logonResp) {
       util.log('Node-dota2 unready.');
     });
 
-    Dota2.on('chatMessage', function (channel, personaName, message) {
+    Dota2.on('chatMessage', function (channel, personaName, message, chatObject) {
       util.log('message from dota: ' + personaName + ': ' + message);
-      bot.channels.get(config.discord_listen_channel).sendMessage('**' + personaName + ':** ' + message);
+      let victory = '';
+      if (chatObject['battle_cup_victory']) victory = '<:victory:251832934825328640>';
+      bot.channels.get(config.discord_listen_channel).sendMessage(`${calcLevel(chatObject['event_points'])}${victory} **` + personaName + ':** ' + message);
     });
 
     Dota2.on('unhandled', (kMsg) => {
