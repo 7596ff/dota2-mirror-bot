@@ -77,7 +77,7 @@ var onSteamLogOn = function (logonResp) {
       util.log('message from dota: ' + personaName + ': ' + message);
       let victory = '';
       if (chatObject['battle_cup_victory']) victory = '<:victory:251832934825328640>';
-      bot.channels.get(config.discord_listen_channel).sendMessage(`${calcLevel(chatObject['event_points'])}${victory} **` + personaName + ':** ' + message);
+      bot.channels.get(config.discord_listen_channel).sendMessage(`${calcLevel(chatObject['event_points'])}${victory} **${personaName}:** ${message}`);
     });
 
     Dota2.on('unhandled', (kMsg) => {
