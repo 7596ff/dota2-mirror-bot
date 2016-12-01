@@ -23,16 +23,16 @@ const token = config.discord_token;
 
 // calculate battle pass level
 var calcLevel = function(level) {
-  if (level == 0) {
-    return "";
-  } else if (level < 20000) {
-    return "<:trophy_1:251810862161985536>";
-  } else if (level < 40000) {
-    return "<:trophy_2:251810861763526657>";
-  } else if (level < 60000) {
-    return "<:trophy_3:251810862224900096>";
-  } else {
+  if (level >= 60000) {
     return "<:trophy_4:251810862686273546>";
+  } else if (level >= 40000) {
+    return "<:trophy_3:251810862224900096>";
+  } else if (level >= 20000) {
+    return "<:trophy_2:251810861763526657>";
+  } else if (level < 20000 && level > 100) {
+    return "<:trophy_1:251810862161985536>";
+  } else {
+    return "";
   }
 }
 
