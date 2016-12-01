@@ -67,6 +67,12 @@ var onSteamLogOn = function (logonResp) {
       Dota2.joinChat(config.bot_channel, config.bot_channel_type);
 
       util.log('Node-dota2 ready.');
+      setTimeout(() => {
+        sendToDota('Ready.');
+        bot.channels.get(config.discord_listen_channel).sendMessage('Ready').then(message => {
+          message.delete(10000);
+        }).catch(err => console.log(err));
+      }, 5000);
     });
 
     Dota2.on('unready', () => {
