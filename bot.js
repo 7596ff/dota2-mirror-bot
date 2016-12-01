@@ -110,10 +110,12 @@ var onSteamLogOn = function (logonResp) {
 
     bot.on('message', message => {
       if (message.channel.name == 'club-purple' && message.member.user.id != config.discord_self_id) {
-        let nickname = message.member.user.username;
-        if (message.member.nickname != null) nickname = message.member.nickname;
-        util.log('message from discord: ' + nickname + ': ' + message.content);
-        sendToDota(nickname + ': ' + message.content);
+        let nickname = message.member.nickname ? message.member.nickname : message.member.user.username;
+
+        if (!message.content.startsWith('!')) {
+          util.log('message from discord: ' + nickname + ': ' + message.content);
+          sendToDota(nickname + ': ' + message.content);
+        }
 
         if (message.content === "!restart") {
           gracefulRestart();
@@ -126,7 +128,7 @@ var onSteamLogOn = function (logonResp) {
           util.log(`linking discord user ${discord_id} with account id ${dota_id}`);
 
           if (isNaN(dota_id)) {
-            dualMessage('Please input a Dota ID (aka a number)!');
+            message.channel.sendMessage('Please input a Dota ID (aka a number)!');
             return;
           }
           
@@ -147,7 +149,6 @@ var onSteamLogOn = function (logonResp) {
                 message.channel.sendMessage('Registering Dota ID with your Discord account...').then(new_message => {
                   db.run(`INSERT INTO users VALUES('${discord_id}', '${dota_id}');`);
                   new_message.edit(`Registered Discord account \`${discord_id}\` with Dota ID \`${dota_id}\``);
-                  sendToDota(`Registered Discord account \`${discord_id}\` with Dota ID \`${dota_id}\``);
                   db.close();
                 }).catch(err => console.log(err));
               } else {
@@ -172,16 +173,57 @@ var onSteamLogOn = function (logonResp) {
             if (err) console.log(err);
             console.log(result);  
             if (result == undefined) {
-              dualMessage('Please link your Dota account with the bot first! `!link <your dota id>`');
+              message.channel.sendMessage('Please link your Dota account with the bot first! `!link <your dota id>`');
               return;
             } 
             
             let dota_id = result.dota_id;
             Dota2.requestPlayerStats(parseInt(dota_id), (acc_id, playerStats) => {
-              dualMessage('some preliminary stats for ' + dota_id);
-              dualMessage('    matches: ' + playerStats['match_count']);
-              dualMessage('    rampages: ' + playerStats['rampages']);
-              dualMessage(`    mean gpm/xpm: ${playerStats['mean_gpm']}/${playerStats['mean_xppm']}`);
+              let embed = { embed: 
+                {
+                  'color': '13512978',
+                  'fields': [
+                    {
+                      'name': 'First Bloods',
+                      'value': playerStats['first_blood_claimed'],
+                      'inline': true
+                    },
+                    {
+                      'name': 'Camps stacked',
+                      'value': playerStats['creeps_stacked'],
+                      'inline': true
+                    },
+                    {
+                      'name': 'Couriers Killed', 
+                      'value': playerStats['couriers_killed'],
+                      'inline': true
+                    },
+                    {
+                      'name': 'Aegis Steals',
+                      'value': playerStats['aegises_snatched'],
+                      'inline': true
+                    },
+                    {
+                      'name': 'Triple Kills',
+                      'value': playerStats['triple_kills'],
+                      'inline': true
+                    }, 
+                    {
+                      'name': 'Rampages',
+                      'value': playerStats['rampages'],
+                      'inline': true
+                    }
+                  ],
+                  'timestamp': new Date().toJSON,
+                  'footer': {
+                    'icon_url': message.author.avatarURL,
+                    'text': 'Lifetime stats for ' + nickname
+                  }
+                }
+              }
+              bot.channels.get(config.discord_listen_channel).sendMessage('', embed).then(message => {
+                util.log('sent embed message');
+              }).catch(err => console.log(err));
             });
           });
 
