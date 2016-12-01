@@ -4,7 +4,7 @@ sentry
 servers
 setupdb.js 
 sqlite3test.js 
-
+chatObject.json
 
 # Logs
 logs

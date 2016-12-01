@@ -43,9 +43,13 @@ var sendToDota = function (msg) {
   Dota2.sendMessage(config.bot_channel, msg);
 }
 
+var sendToDiscord = function (msg) {
+  bot.channels.get(config.discord_listen_channel).sendMessage(msg);
+}
+
 // do send message stuff
 var dualMessage = function (msg) {
-  bot.channels.get(config.discord_listen_channel).sendMessage(msg);
+  sendToDiscord(msg);
   sendToDota(msg);
 };
 
@@ -81,9 +85,19 @@ var onSteamLogOn = function (logonResp) {
 
     Dota2.on('chatMessage', function (channel, personaName, message, chatObject) {
       util.log('message from dota: ' + personaName + ': ' + message);
-      let victory = '';
-      if (chatObject['battle_cup_victory']) victory = '<:victory:251832934825328640>';
-      bot.channels.get(config.discord_listen_channel).sendMessage(`${calcLevel(chatObject['event_points'])}${victory} **${personaName}:** ${message}`);
+      //console.log(JSON.stringify(chatObject));
+      let victory = chatObject['battle_cup_victory'] ? '<:victory:251832934825328640>' : '';
+      let level = calcLevel(chatObject['event_points']);
+
+      if (chatObject['share_profile_account_id']) {
+        sendToDiscord(`${level}${victory} **${personaName}:** My profile is: [${personaName}]`);
+      } else if (chatObject['share_party_id']) {
+        sendToDiscord(`${level}${victory} **${personaName}:** Join my party: [Join Party]`);
+      } else if (chatObject['dice_roll']) {
+        sendToDiscord(`${level}${victory} **${personaName}** rolls (${chatObject['dice_roll']['roll_min']}-${chatObject['dice_roll']['roll_max']}): ${chatObject['dice_roll']['result']}`);
+      } else {
+        sendToDiscord(`${level}${victory} **${personaName}:** ${message}`);
+      }
     });
 
     Dota2.on('unhandled', (kMsg) => {
