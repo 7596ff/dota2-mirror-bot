@@ -32,4 +32,7 @@ config.discord_listen_channel = '';
 // discord bot's id
 config.discord_self_id = '';
 
+// invite link to your relevant discord
+config.discord_invite_link = '';
+
 module.exports = config;
