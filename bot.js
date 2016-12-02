@@ -81,6 +81,7 @@ var onSteamLogOn = function (logonResp) {
 
     Dota2.on('unready', () => {
       util.log('Node-dota2 unready.');
+      gracefulRestart();
     });
 
     Dota2.on('chatMessage', function (channel, personaName, message, chatObject) {
@@ -97,6 +98,9 @@ var onSteamLogOn = function (logonResp) {
         sendToDiscord(`${level}${victory} **${personaName}** rolls (${chatObject['dice_roll']['roll_min']}-${chatObject['dice_roll']['roll_max']}): ${chatObject['dice_roll']['result']}`);
       } else {
         sendToDiscord(`${level}${victory} **${personaName}:** ${message}`);
+        if (message.match('!discord')) {
+          dualMessage('https://discord.gg/d3wj7Aw');
+        }
       }
     });
 
@@ -113,8 +117,8 @@ var onSteamLogOn = function (logonResp) {
         let nickname = message.member.nickname ? message.member.nickname : message.member.user.username;
 
         if (!message.content.startsWith('!')) {
-          util.log('message from discord: ' + nickname + ': ' + message.content);
-          sendToDota(nickname + ': ' + message.content);
+          util.log('message from discord: ' + nickname + ': ' + message.cleanContent);
+          sendToDota(nickname + ': ' + message.cleanContent);
         }
 
         if (message.content === "!restart") {
@@ -179,7 +183,7 @@ var onSteamLogOn = function (logonResp) {
             
             let dota_id = result.dota_id;
             Dota2.requestPlayerStats(parseInt(dota_id), (acc_id, playerStats) => {
-              let embed = { embed: 
+              let embed = { 'embed': 
                 {
                   'color': '13512978',
                   'fields': [
