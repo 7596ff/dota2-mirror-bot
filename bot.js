@@ -99,7 +99,7 @@ var onSteamLogOn = function (logonResp) {
       } else {
         sendToDiscord(`${level}${victory} **${personaName}:** ${message}`);
         if (message.match('!discord')) {
-          dualMessage('https://discord.gg/d3wj7Aw');
+          dualMessage(global.discord_invite_link);
         }
       }
     });
